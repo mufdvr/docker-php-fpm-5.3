@@ -36,7 +36,7 @@ RUN mkdir -p $PHP_INI_DIR/conf.d
 
 # compile openssl, otherwise --with-openssl won't work
 RUN set -xe \
-	&& OPENSSL_VERSION="1.0.2g" \
+	&& OPENSSL_VERSION="1.0.2u" \
 	&& cd /tmp \
 	&& mkdir openssl \
 	&& curl -sL "https://www.openssl.org/source/openssl-$OPENSSL_VERSION.tar.gz" -o openssl.tar.gz \
@@ -64,6 +64,13 @@ RUN set -xe \
 		libsqlite3-dev \
 		libssl-dev \
 		libxml2-dev \
+		libpng-dev \
+		libxpm-dev \
+		libjpeg-dev \
+		libbz2-dev \
+		libpng12-dev \
+		libfreetype6-dev \
+		libmysqlclient-dev \
 	" \
 	&& DEBIAN_FRONTEND=noninteractive apt-get update -qq \
 	&& DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --no-install-recommends --no-install-suggests \
@@ -71,6 +78,9 @@ RUN set -xe \
 	&& DEBIAN_FRONTEND=noninteractive apt-get purge -qq -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
 	&& rm -rf /var/lib/apt/lists/* \
 	\
+	&& ln -s /usr/lib/x86_64-linux-gnu/libXpm.a /usr/lib/libXpm.a \
+	&& mkdir /usr/include/freetype2/freetype \
+  && ln -s /usr/include/freetype2/freetype.h /usr/include/freetype2/freetype/freetype.h \
 	&& mkdir -p /usr/src/php \
 	&& curl -SL "http://php.net/get/php-$PHP_VERSION.tar.xz/from/this/mirror" -o /usr/src/php.tar.xz \
 	&& curl -SL "http://php.net/get/php-$PHP_VERSION.tar.xz.asc/from/this/mirror" -o /usr/src/php.tar.xz.asc \
@@ -91,6 +101,14 @@ RUN set -xe \
 		--with-readline \
 		--with-recode \
 		--with-zlib \
+		--with-gd \
+		--enable-gd-native-ttf \
+		--with-png \
+		--with-zlib-dir=/usr/local/lib/zlib \
+		--with-ttf \
+		--with-jpeg-dir=/usr/local/lib/jpeg-6b/ \
+		--with-freetype-dir=/usr/local/lib/freetype/ \
+		--with-xpm-dir=/usr/X11R6 \
 	&& make -j"$(nproc)" \
 	&& make install \
 	&& make clean \

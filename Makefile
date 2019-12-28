@@ -1,6 +1,6 @@
 DIR = .
 FILE = Dockerfile
-IMAGE = devilbox/php-fpm-5.3
+IMAGE = mufdvr/php-fpm-5.3
 TAG = latest
 
 .PHONY: build rebuild test tag pull login push enter
